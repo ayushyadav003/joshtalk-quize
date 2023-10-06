@@ -4,4 +4,13 @@
   border: 1px solid #dcdcdc;
   height: 100vh;
   margin-left: auto;
+  display: grid;
+  height: 100vh;
+  overflow: auto;
+  p {
+    font-size: 12px;
+    margin: 0;
+    border-top: 1px solid #dcdcdc;
+    padding: 8px 15px;
+  }
 }

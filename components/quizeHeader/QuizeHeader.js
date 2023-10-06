@@ -2,10 +2,10 @@ import Timer from "@/widgets/timer/Timer";
 import React from "react";
 import styles from "./QuizeHeader.module.scss";
 
-function QuizeHeader() {
+function QuizeHeader({ handleReport }) {
   return (
     <div className={styles.QuizeHeaderContainer}>
-      <Timer />
+      <Timer handleReport={handleReport} />
     </div>
   );
 }

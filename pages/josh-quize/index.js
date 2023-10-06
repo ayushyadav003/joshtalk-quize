@@ -2,66 +2,143 @@ import QuestionsPanel from "@/components/questionsPanel/QuestionsPanel";
 import QuizeHeader from "@/components/quizeHeader/QuizeHeader";
 import React, { useEffect, useState } from "react";
 import styles from "./joshQuize.module.scss";
-import { fetchQuestion } from "@/services/QuestionsApi";
+import { useSelector } from "react-redux";
+import { useRouter } from "next/router";
 
 function JoshQuize() {
-  const [questionsData, setQuestionData] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [score, setScore] = useState();
   const [answers, setAnswers] = useState([]);
+  const [result, setResult] = useState({
+    correct: 0,
+    incorrect: 0,
+    notAttempted: 0,
+    total: 0,
+  });
+  const [showReport, setShowReport] = useState(false);
+  const router = useRouter();
+
+  const { quizeQuestion, optionData } = useSelector(({ Quize }) => Quize);
+
   useEffect(() => {
-    fetchQuizeData();
-  }, []);
-
-  const fetchQuizeData = async () => {
-    const data = await fetchQuestion();
-    setQuestionData(data);
-    console.log(data);
-  };
-
-  const optionsHandler = () => {
-    let data = questionsData[currentQuestion];
-    if (data) {
-      let options = [...data?.incorrect_answers, data?.correct_answer];
-      for (let i = options.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [options[i], options[j]] = [options[j], options[i]];
-      }
-      console.log(options);
-      return options;
+    if (!quizeQuestion) {
+      router.push("/");
     }
+  }, [quizeQuestion]);
+
+  const handleReport = () => {
+    let finalAnswers = Object.values(answers);
+    let arrLength = quizeQuestion.length;
+    let scoreCount = 0;
+    let incorrectScore = 0;
+    let notAttempted = 0;
+    let total = 0;
+    for (let i = 0; i < arrLength; i++) {
+      if (finalAnswers[i] === undefined) {
+        notAttempted++;
+      } else if (quizeQuestion[i].correct_answer === finalAnswers[i]) {
+        scoreCount++;
+      } else incorrectScore++;
+    }
+    total = (scoreCount * 100) / (scoreCount + incorrectScore + notAttempted);
+    total = Math.round(total);
+    setResult({
+      correct: scoreCount,
+      incorrect: incorrectScore,
+      notAttempted,
+      total,
+    });
+    setShowReport(true);
   };
 
   return (
-    <div className={styles.quizeContainer}>
-      <div className={styles.innerWrapper}>
-        <QuizeHeader />
-        <div className={styles.questionsWrapper}>
-          {questionsData && (
-            <>
-              <p>{questionsData[currentQuestion]?.question}</p>
-              <div className={styles.optionsWrapper}>
-                {optionsHandler()?.map((option, i) => {
-                  return <span>{option}</span>;
-                })}
-              </div>
-            </>
-          )}
+    <>
+      {showReport ? (
+        <div className={styles.finalReportContainer}>
+          <h2>Final Report</h2>
+          <div className={styles.reportStatsWrapper}>
+            <div>
+              <p style={{ color: "green" }}>Correct answers </p>
+              <p style={{ color: "red" }}>Incorrect answers </p>
+              <p style={{ color: "#8B8000" }}>Not attempted </p>
+              <p>Final Result</p>
+            </div>
+            <div>
+              <p style={{ color: "green" }}>{result.correct}</p>
+              <p style={{ color: "red" }}>{result.incorrect}</p>
+              <p style={{ color: "#8B8000" }}>{result.notAttempted}</p>
+              <p>{result.total} %</p>
+            </div>
+          </div>
         </div>
-        <div className={styles.btnWrapper}>
-          {currentQuestion !== 0 && (
-            <button onClick={() => setCurrentQuestion(currentQuestion - 1)}>
-              Previous
-            </button>
-          )}
-          <button onClick={() => setCurrentQuestion(currentQuestion + 1)}>
-            Next
-          </button>
+      ) : (
+        <div className={styles.quizeContainer}>
+          <div className={styles.innerWrapper}>
+            <QuizeHeader handleReport={handleReport} />
+            <div className={styles.questionsWrapper}>
+              {quizeQuestion && (
+                <>
+                  <p>{quizeQuestion[currentQuestion]?.question}</p>
+                  <div className={styles.optionsWrapper}>
+                    {optionData[0][currentQuestion]?.map((option, i) => {
+                      return (
+                        <span
+                          style={{
+                            background:
+                              answers[currentQuestion] === option && "#babaff",
+                          }}
+                          onClick={() =>
+                            setAnswers({
+                              ...answers,
+                              [currentQuestion]: option,
+                            })
+                          }
+                        >
+                          {option}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
+            <div className={styles.btnWrapper}>
+              {currentQuestion === quizeQuestion?.length - 1 ? (
+                <>
+                  <button
+                    onClick={() => setCurrentQuestion(currentQuestion - 1)}
+                  >
+                    Previous
+                  </button>
+                  <button onClick={() => handleReport()}>Submit</button>
+                </>
+              ) : (
+                <>
+                  {currentQuestion !== 0 && (
+                    <button
+                      onClick={() => setCurrentQuestion(currentQuestion - 1)}
+                    >
+                      Previous
+                    </button>
+                  )}
+
+                  <button
+                    onClick={() => setCurrentQuestion(currentQuestion + 1)}
+                  >
+                    Next
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+          <QuestionsPanel
+            questionsData={quizeQuestion}
+            currentQuestion={currentQuestion}
+            setCurrentQuestion={setCurrentQuestion}
+          />
         </div>
-      </div>
-      <QuestionsPanel questionsData={questionsData} />
-    </div>
+      )}
+    </>
   );
 }
 
-export default JoshQuize;
+export default React.memo(JoshQuize);

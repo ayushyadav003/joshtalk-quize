@@ -4,15 +4,20 @@ import { HYDRATE } from "next-redux-wrapper";
 // initial State
 const initialState = {
   quizeQuestion: null,
+  optionData: [],
 };
 
 export const quizeSlice = createSlice({
   name: "Quize",
   initialState,
   reducers: {
-    // set input value action
+    // setting up all questions data
     setQuizeQuestions(state, action) {
       state.quizeQuestion = action.payload;
+    },
+    // setting up junbled options
+    setOptionData(state, action) {
+      state.optionData = action.payload;
     },
   },
 
@@ -26,4 +31,4 @@ export const quizeSlice = createSlice({
   },
 });
 
-export const { setQuizeQuestions } = movieDetailSlice.actions;
+export const { setQuizeQuestions, setOptionData } = quizeSlice.actions;

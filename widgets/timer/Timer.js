@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from "react";
 
-export default function Timer() {
+export default function Timer({ handleReport }) {
   const [time, setTime] = useState(1800);
 
   useEffect(() => {
-    // let timer = setInterval(() => {
-    //   setTime((time) => {
-    //     if (time === 0) {
-    //       clearInterval(timer);
-    //       return 0;
-    //     } else return time - 1;
-    //   });
-    // }, 1000);
+    let timer = setInterval(() => {
+      setTime((time) => {
+        if (time === 0) {
+          clearInterval(timer);
+          handleReport();
+          return 0;
+        } else return time - 1;
+      });
+    }, 1000);
   }, []);
 
   return (

@@ -36,6 +36,8 @@
       }
     }
     .btnWrapper {
+      position: fixed;
+      width: 70vw;
       display: flex;
       justify-content: space-evenly;
       margin-top: 20vh;
@@ -47,6 +49,40 @@
         padding: 10px 20px;
         width: 150px;
         border-radius: 10px;
+      }
+    }
+  }
+}
+.finalReportContainer {
+  text-align: center;
+  h2 {
+    font-size: 3em;
+    font-weight: 700;
+    margin: auto;
+  }
+  .reportStatsWrapper {
+    display: flex;
+    margin: 10% auto auto auto;
+    border: 1px solid #dcdcdc;
+    width: fit-content;
+    div {
+      text-align: left;
+      p {
+        padding: 10px 40px;
+        border: 1px solid #dcdcdc;
+        font-size: 1.3em;
+        font-weight: 600;
+      }
+    }
+  }
+  .reportStatsContainer {
+    div {
+      width: fit-content;
+      margin: 4rem auto;
+      display: grid;
+      gap: 2rem;
+      p {
+        color: red;
       }
     }
   }
